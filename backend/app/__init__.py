@@ -1,0 +1,2 @@
+"""SkillMarket backend application package."""
+
