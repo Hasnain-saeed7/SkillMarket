@@ -26,9 +26,12 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://skill-market-theta.vercel.app",
+        "https://skill-market-1kyjhhre4-hasnain-saeed7s-projects.vercel.app",
+        "http://localhost:5173
+    "],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
 )
 
