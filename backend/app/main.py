@@ -28,7 +28,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://skill-market-theta.vercel.app",
         "https://skill-market-1kyjhhre4-hasnain-saeed7s-projects.vercel.app",
-        "http://localhost:5173
+        "http://localhost:5173",
     "],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
