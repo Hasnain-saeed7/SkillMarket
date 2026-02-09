@@ -1,5 +1,6 @@
 import os
-from pathlib import Path
+from pathlib import Path 
+from database import Base, engine
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -46,4 +47,8 @@ app.include_router(message_routes.router) # This handles your contact form (/mes
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok"} 
+
+@app.on_event("startup")
+async def startup():
+     Base.metadata.create_all(bind=engine)
