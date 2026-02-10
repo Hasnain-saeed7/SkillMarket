@@ -46,9 +46,8 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 # 6. Include Routers
 app.include_router(auth_routes.router, tags=["Authentication"])
-app.include_router(gig_routes.router, prefix="/gigs", tags=["Gigs"])
-app.include_router(message_routes.router, prefix="/messages", tags=["Messages"])
-
+app.include_router(gig_routes.router, tags=["Gigs"])
+app.include_router(message_routes.router, tags=["Messages"])
 # 7. Health Check & Root Routes
 @app.get("/")
 def read_root():
