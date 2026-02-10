@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from app.core.config import CORS_ORIGINS, UPLOAD_DIR
 from app.core.logging import setup_logging
 from app.db.session import engine
-from app.models import Base ,user, gig, message  # noqa: F401 - needed for table creation
+from app.models import Base ,User, Gig, Message  # noqa: F401 - needed for table creation
 
 # Importing your route modules
 from routes import auth_routes, gig_routes, message_routes
