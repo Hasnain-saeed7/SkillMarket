@@ -11,35 +11,49 @@ from app.core.config import CORS_ORIGINS, UPLOAD_DIR
 from app.core.logging import setup_logging
 from app.db.session import engine
 from app.models import Base 
-# Fixed imports to match your file names in the 'routes' folder
+
+# Importing your route modules
 from routes import auth_routes, gig_routes, message_routes
 
+# 1. Initialize Logging
 setup_logging()
 
+# 2. Create Database Tables (Note: This won't update existing columns)
 Base.metadata.create_all(bind=engine) 
 
 app = FastAPI(title="SkillMarket API", version="2.0.0")
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    return JSONResponse(status_code=400, content={"detail": exc.errors()})
-
+# 3. CORS MIDDLEWARE (Must be defined early to intercept preflight requests)
+# Now using CORS_ORIGINS from environment variable
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+    allow_methods=["*"], # Allows GET, POST, PUT, DELETE, etc.
+    allow_headers=["*"], # Allows all headers like Authorization and Content-Type
+) 
 
-# Static uploads
+# 4. Global Exception Handlers
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=400, 
+        content={"detail": exc.errors()}
+    )
+
+# 5. Static Files Setup
 Path(UPLOAD_DIR).mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
-# FIX: Use the names you actually imported above
-app.include_router(auth_routes.router)
-app.include_router(gig_routes.router)     # This handles your "Launch Service" (/gigs)
-app.include_router(message_routes.router) # This handles your contact form (/messages)
+# 6. Include Routers
+app.include_router(auth_routes.router, tags=["Authentication"])
+app.include_router(gig_routes.router, prefix="/gigs", tags=["Gigs"])
+app.include_router(message_routes.router, prefix="/messages", tags=["Messages"])
+
+# 7. Health Check & Root Routes
+@app.get("/")
+def read_root():
+    return {"message": "SkillMarket API is live!", "docs": "/docs"}
 
 @app.get("/health")
 def health():
