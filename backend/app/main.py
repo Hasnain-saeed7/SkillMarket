@@ -18,20 +18,19 @@ from routes import auth_routes, gig_routes, message_routes
 # 1. Initialize Logging
 setup_logging()
 
-# 2. Create Database Tables (Note: This won't update existing columns)
+# 2. Create Database Tables
 Base.metadata.create_all(bind=engine) 
 
 app = FastAPI(title="SkillMarket API", version="2.0.0")
 
-# 3. CORS MIDDLEWARE (Must be defined early to intercept preflight requests)
-# Now using CORS_ORIGINS from environment variable
+# 3. CORS MIDDLEWARE - Using environment variable
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"], # Allows GET, POST, PUT, DELETE, etc.
-    allow_headers=["*"], # Allows all headers like Authorization and Content-Type
-) 
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # 4. Global Exception Handlers
 @app.exception_handler(RequestValidationError)
