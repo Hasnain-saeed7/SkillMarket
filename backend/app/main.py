@@ -7,12 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-# Note: Ensure these paths match your project structure
+# Import paths from your project structure
 from app.core.config import CORS_ORIGINS
 from app.core.logging import setup_logging
 from app.db.session import engine
-import models
-from models import Base, User, Gig, Message  # noqa: F401
+from app.models import Base  # Ensure correct import path for Base
 from routes import auth_routes, gig_routes, message_routes
 
 # 1. Initialize Logging
@@ -24,10 +23,16 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="SkillMarket API", version="2.0.0")
 
 # 3. CORS MIDDLEWARE 
-# Updated to ensure Vercel can communicate with Render without 400 errors
+# FIXED: Removed trailing slash from Vercel URL and added local dev origins
+origins = [
+    "https://skillmarket-chi.vercel.app",  # No trailing slash
+    "http://localhost:5173",               # Standard Vite local port
+    "http://127.0.0.1:5173",               # Alternative local address
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://skillmarket-chi.vercel.app/"], # For production, you can replace "*" with your specific Vercel URL
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,8 +47,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )
 
 # 5. Static Files Setup
-# User uploads are now handled by Cloudinary, so we only use this for 
-# permanent system assets (like logos) stored in a 'static' folder.
 STATIC_DIR = "static"
 Path(STATIC_DIR).mkdir(parents=True, exist_ok=True)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
