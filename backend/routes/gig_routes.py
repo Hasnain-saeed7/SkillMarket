@@ -83,4 +83,34 @@ def create_gig(
             detail=str(e) or "Validation error",
         )
 
+@router.delete("/{gig_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_gig(
+    gig_id: int, 
+    db: Session = Depends(get_db), 
+    current_user: dict = Depends(require_user)
+):
+    """Only the owner can delete their gig."""
+    # 1. Fetch the gig from the database
+    gig = crud.get_gig_by_id(db, gig_id)
+    if not gig:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, 
+            detail="Gig not found"
+        )
+    
+    # 2. Check if the current user ID matches the seller ID
+    if gig.seller_id != current_user.get("user_id"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, 
+            detail="You are not authorized to delete this gig"
+        )
+
+    # 3. Proceed with deletion
+    if not crud.delete_gig(db, gig_id):
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+            detail="Failed to delete gig"
+        )
+    
+    return None
 # ... (Keep your existing GET /{id}, PUT, and DELETE routes)

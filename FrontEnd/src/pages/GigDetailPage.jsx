@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { getGigById } from '../api/client';
+import { getGigById, deleteGig } from '../api/client'; // Import deleteGig
 
 // Fallback images
 const categoryImages = {
@@ -23,7 +23,6 @@ const GigDetailPage = () => {
   useEffect(() => {
     const fetchGig = async () => {
       try {
-        // Ensure the ID is passed correctly to the backend
         const { data } = await getGigById(id);
         setGig(data);
       } catch (err) {
@@ -35,6 +34,20 @@ const GigDetailPage = () => {
     };
     fetchGig();
   }, [id]);
+
+  // Handle Delete Functionality
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this gig? This action cannot be undone.")) {
+      try {
+        await deleteGig(id);
+        alert("Gig deleted successfully!");
+        navigate('/'); // Redirect to home after deletion
+      } catch (err) {
+        console.error("Delete Error:", err);
+        alert(err.response?.data?.detail || "Failed to delete the gig. Ensure you are the owner.");
+      }
+    }
+  };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -49,11 +62,7 @@ const GigDetailPage = () => {
     </div>
   );
 
-  // --- LOGIC FIX FOR IMAGE URL ---
-  // 1. Check if gig has an image_url, otherwise use category fallback
   const rawUrl = gig.image_url || categoryImages[gig.category];
-  
-  // 2. Handle Cloudinary (https) vs Local (/uploads) paths
   const finalImageUrl = (rawUrl && rawUrl.startsWith('/')) 
     ? `${API_BASE}${rawUrl}` 
     : rawUrl;
@@ -109,17 +118,28 @@ const GigDetailPage = () => {
               </p>
             </div>
 
-            <div className="flex gap-4">
-              <Link
-                to="/contact"
-                className="flex-1 text-center bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-600 transition-all shadow-lg shadow-slate-200"
+            {/* BUTTON SECTION */}
+            <div className="flex flex-wrap gap-4">
+              {/* CONTACT BUTTON - Using mailto link */}
+              <a
+                href={`mailto:support@skillmarket.com?subject=Inquiry about: ${gig.title}`}
+                className="flex-1 min-w-[200px] text-center bg-indigo-600 text-white px-8 py-4 rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100"
               >
                 Contact Seller
-              </Link>
-              <button className="px-8 py-4 border-2 border-slate-100 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition-all">
-                Save to Wishlist
+              </a>
+
+              {/* DELETE BUTTON */}
+              <button 
+                onClick={handleDelete}
+                className="flex-1 min-w-[200px] px-8 py-4 border-2 border-red-100 text-red-600 rounded-2xl font-bold hover:bg-red-50 hover:border-red-200 transition-all"
+              >
+                Delete Gig
               </button>
             </div>
+            
+            <p className="mt-6 text-center text-xs text-slate-400 font-medium">
+              ID: {id} • Secured via SkillMarket API
+            </p>
           </div>
         </div>
       </div>
