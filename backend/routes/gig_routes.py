@@ -31,9 +31,6 @@ def require_user(user: dict | None = Depends(get_current_user)):
         )
     return user
 
-@router.get("", response_model=list[schemas.GigOut])
-def list_gigs(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return crud.get_gigs(db, skip=skip, limit=limit)
 
 @router.post("/upload-image")
 async def upload_gig_image(
@@ -113,4 +110,15 @@ def delete_gig(
         )
     
     return None
+
+
+@router.get("/{gig_id}", response_model=schemas.GigOut)
+def get_gig(gig_id: int, db: Session = Depends(get_db)):
+    gig = crud.get_gig_by_id(db, gig_id)
+    if not gig:
+        raise HTTPException(status_code=404, detail="Gig not found")
+    return gig 
+
+
+
 # ... (Keep your existing GET /{id}, PUT, and DELETE routes)
