@@ -7,11 +7,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.core.config import CORS_ORIGINS, UPLOAD_DIR
+from app.core.config import CORS_ORIGINS
 from app.core.logging import setup_logging
 from app.db.session import engine
 import models
-from models import Base,User, Gig, Message  # noqa: F401 - needed for Base.metadata.create_all() to find tables
+from models import Base, User, Gig, Message  # noqa: F401
 
 # Importing your route modules
 from routes import auth_routes, gig_routes, message_routes
@@ -24,7 +24,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SkillMarket API", version="2.0.0")
 
-# 3. CORS MIDDLEWARE - Using environment variable
+# 3. CORS MIDDLEWARE
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
@@ -41,14 +41,18 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         content={"detail": exc.errors()}
     )
 
-# 5. Static Files Setup
-Path(UPLOAD_DIR).mkdir(parents=True, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+# 5. Static Files (Optional)
+# We keep this ONLY for core assets like your logo or CSS. 
+# It is NO LONGER used for user-uploaded gig images.
+STATIC_DIR = "static"
+Path(STATIC_DIR).mkdir(parents=True, exist_ok=True)
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # 6. Include Routers
 app.include_router(auth_routes.router, tags=["Authentication"])
 app.include_router(gig_routes.router, tags=["Gigs"])
 app.include_router(message_routes.router, tags=["Messages"])
+
 # 7. Health Check & Root Routes
 @app.get("/")
 def read_root():
@@ -56,4 +60,4 @@ def read_root():
 
 @app.get("/health")
 def health():
-    return {"status": "ok"}
+    return {"status": "ok"} 
