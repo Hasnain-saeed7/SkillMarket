@@ -13,6 +13,7 @@ from app.core.logging import setup_logging
 from app.db.session import engine
 import models
 from models import Base, User, Gig, Message  # noqa: F401
+from routes import auth_routes, gig_routes, message_routes
 
 # 1. Initialize Logging
 setup_logging()
