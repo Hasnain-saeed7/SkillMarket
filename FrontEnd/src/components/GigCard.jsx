@@ -21,9 +21,15 @@ const categoryGradients = {
 const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
 const GigCard = ({ gig }) => {
-  // Use image_url from backend if available (resolve relative paths), otherwise fallback to category mapping
+  // 1. Determine the raw source: either the backend URL, the category fallback, or a generic default
   const rawUrl = gig.image_url || categoryImages[gig.category] || "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop&q=80";
-  const imageUrl = rawUrl.startsWith('/') ? `${API_BASE}${rawUrl}` : rawUrl;
+
+  // 2. LOGIC FIX: Only prepend API_BASE if the URL is a local relative path (starts with /)
+  // Cloudinary URLs starting with 'http' will be used directly as permanent links
+  const imageUrl = (rawUrl && rawUrl.startsWith('/')) 
+    ? `${API_BASE}${rawUrl}` 
+    : rawUrl;
+
   const gradient = categoryGradients[gig.category] || "from-gray-500 to-gray-600";
 
   return (
@@ -35,20 +41,18 @@ const GigCard = ({ gig }) => {
           alt={gig.title}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           onError={(e) => {
+            // Fallback if the Cloudinary link or backend link fails
             e.target.src = `https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&h=300&fit=crop&q=80`;
           }}
         />
-        {/* Gradient overlay on hover */}
         <div className={`absolute inset-0 bg-gradient-to-t ${gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`}></div>
         
-        {/* Category badge */}
         <div className="absolute top-3 left-3">
           <span className="px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-xs font-bold text-slate-800 shadow-lg border border-white/50">
             {gig.category}
           </span>
         </div>
         
-        {/* Rating badge */}
         <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1.5 bg-white/90 backdrop-blur-md rounded-full text-xs font-bold text-slate-800 shadow-lg border border-white/50">
           <svg className="w-3.5 h-3.5 text-yellow-500 fill-current" viewBox="0 0 20 20">
             <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z"/>
@@ -59,28 +63,25 @@ const GigCard = ({ gig }) => {
 
       {/* Content Section */}
       <div className="p-6">
-        {/* Seller Info */}
         <div className="flex items-center space-x-3 mb-4">
           <div className="relative">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 uppercase flex items-center justify-center text-sm font-bold text-white shadow-lg group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
-              {gig.seller[0]}
+              {gig.seller ? gig.seller[0] : '?'}
             </div>
             <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-emerald-500 rounded-full border-2 border-white shadow-lg"></div>
           </div>
           <div>
             <div className="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">
-              {gig.seller}
+              {gig.seller || "Anonymous"}
             </div>
             <div className="text-xs font-semibold text-slate-500">Level 2 Seller</div>
           </div>
         </div>
 
-        {/* Title */}
         <h3 className="text-base font-bold text-slate-900 line-clamp-2 min-h-[3.5rem] group-hover:text-indigo-600 transition-colors mb-4 leading-snug">
           {gig.title}
         </h3>
 
-        {/* Features */}
         <div className="flex items-center gap-4 mb-5 text-xs text-slate-500">
           <div className="flex items-center gap-1">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +97,6 @@ const GigCard = ({ gig }) => {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="pt-5 border-t border-slate-100 flex justify-between items-center">
           <Link
             to={`/gig/${gig.id}`}
