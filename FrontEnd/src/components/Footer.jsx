@@ -102,6 +102,12 @@ const Footer = () => {
           <div className="flex items-center gap-6 text-sm text-gray-600">
             <span>English (US)</span>
             <span>$ USD</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
 
 export default Footer; 
 
