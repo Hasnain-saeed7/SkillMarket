@@ -28,23 +28,22 @@ const HomePage = () => {
     fetchGigs();
   }, []);
 
-  // Filter the real gigs from database
   const filteredGigs = activeCategory === "All" 
     ? gigs 
     : gigs.filter(g => g.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+    <div className="min-h-screen bg-white pt-16">
       <Hero />
       <Features /> 
       
       <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 rounded-full mb-4">
-            <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></span>
-            <span className="text-sm font-semibold text-blue-600">Browse Services</span>
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full mb-4">
+            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+            <span className="text-sm font-medium text-gray-700">Browse Services</span>
           </div>
-          <h2 className="text-4xl font-extrabold text-gray-900 mb-4">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Featured <span className="gradient-text">Services</span>
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
@@ -55,7 +54,7 @@ const HomePage = () => {
         <CategoryBar activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
 
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-50 text-red-700 font-medium text-sm">
+          <div className="mb-6 p-4 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200">
             {error}
           </div>
         )}
@@ -74,7 +73,7 @@ const HomePage = () => {
         </div>
 
         {loading ? (
-          <div className="text-center py-20 text-gray-500 font-medium">Loading services...</div>
+          <div className="text-center py-20 text-gray-500">Loading services...</div>
         ) : filteredGigs.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredGigs.map(gig => (

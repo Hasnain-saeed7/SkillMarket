@@ -23,8 +23,6 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
         </Routes>
       </main>
-
-      {/* Footer stays at the bottom of every page */}
       <Footer />
     </div>
   );

@@ -147,4 +147,4 @@ const GigDetailPage = () => {
   );
 };
 
-export default GigDetailPage;
+export default GigDetailPage; 
